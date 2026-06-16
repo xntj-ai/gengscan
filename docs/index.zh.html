@@ -1,0 +1,256 @@
+<!doctype html><html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GengScan · 学术论文数据完整性指纹筛查</title>
+<meta name="description" content="GengScan 是一个 Claude Code / Agent 技能:一条可复用流水线,对论文 Source Data 跑数值造假指纹筛查 —— 从学者到论文、到数据、到 A/G/F/H 四类硬指纹,外加可选 ORB 图像取证。机器把可疑摆到人面前,定性交给人。命中是线索,不是判决。">
+<link rel="canonical" href="https://xntj-ai.github.io/gengscan/index.zh.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://xntj-ai.github.io/gengscan/index.zh.html">
+<link rel="alternate" hreflang="en" href="https://xntj-ai.github.io/gengscan/">
+<link rel="alternate" hreflang="x-default" href="https://xntj-ai.github.io/gengscan/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GengScan · 学术论文数据完整性指纹筛查">
+<meta property="og:description" content="一个 Claude Code / Agent 技能:对论文 Source Data 跑数值造假指纹筛查。机器把可疑摆到人面前,定性交给人。命中是线索,不是判决。">
+<meta property="og:locale" content="zh_CN">
+<style>
+:root{
+  --bg:#FAF8F4; --surf:#FFFFFF; --line:#ECE6DC; --line2:#E2DACB;
+  --ink:#2A2722; --ink2:#6B6356; --mut:#9A9082;
+  --gold:#C8922E; --gold2:#F0B24A; --jade:#1f6f5c; --terra:#B4502E; --blue:#3E6B8C;
+  --r:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,system-ui,sans-serif;
+  font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:.1px}
+a{color:var(--gold);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:30px 28px 90px}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:8px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px;font-weight:740;font-size:16px;letter-spacing:-.2px}
+.brand .tag{font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--gold);
+  background:#FAF1DF;border:1px solid #EBD9B6;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:16px;font-size:13.5px;color:var(--ink2)}
+.nav .lang{color:var(--mut)} .nav .lang b{color:var(--ink)}
+
+/* hero */
+.kicker{font-size:12.5px;letter-spacing:2.5px;color:var(--gold);font-weight:700;text-transform:uppercase}
+h1{font-size:38px;line-height:1.18;letter-spacing:-.6px;margin:14px 0 12px;font-weight:790}
+.lead{color:var(--ink2);font-size:17px;max-width:760px;margin:0}
+.intro{color:var(--ink2);font-size:15.5px;max-width:800px;margin:18px 0 0}
+
+h2{font-size:23px;letter-spacing:-.3px;margin:62px 0 6px;font-weight:730;display:flex;align-items:center;gap:11px}
+h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none}
+.sub{color:var(--ink2);font-size:14.5px;margin:0 0 4px}
+.note{color:var(--mut);font-size:13px;margin-top:12px;line-height:1.6}
+b{font-weight:680}
+code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;
+  background:#F3EEE5;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--terra)}
+
+/* pipeline flow */
+.flow{display:flex;align-items:stretch;gap:10px;margin-top:26px;flex-wrap:wrap}
+.fstep{flex:1;min-width:158px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 17px;position:relative;box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.fstep .fk{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.fstep h4{margin:8px 0 6px;font-size:15.5px;font-weight:730;letter-spacing:-.2px}
+.fstep p{margin:0;font-size:13px;color:var(--ink2);line-height:1.55}
+.fstep.fin{border-color:#E6C98A;background:linear-gradient(180deg,#FFFDF8,#FFF)}
+.fstep.fin .fk{color:var(--gold)}
+.farr{display:flex;align-items:center;color:#CDB892;font-size:22px;font-weight:400;flex:none;padding:0 2px}
+@media(max-width:720px){.farr{transform:rotate(90deg);align-self:center;padding:3px 0}.fstep{min-width:100%}.flow{flex-direction:column}}
+
+/* shapes */
+.shapes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
+.shape{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px 18px;text-align:center;
+  box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.shape svg{display:block;margin:0 auto 14px}
+.shape .sn{font-size:15px;font-weight:730} .shape .se{font-size:12.5px;color:var(--mut);letter-spacing:.5px}
+.shape p{margin:8px 0 0;font-size:13px;color:var(--ink2);line-height:1.55}
+.shape .gate{display:block;margin-top:9px;font-size:11.5px;color:var(--jade);background:#E3EFE9;
+  border:1px solid #CDE5DB;border-radius:8px;padding:6px 9px;line-height:1.5;text-align:left}
+.variants{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.vchip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2);
+  background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+.vdot{width:10px;height:10px;border-radius:50%;flex:none}
+@media(max-width:720px){.shapes{grid-template-columns:1fr}}
+
+/* architecture */
+.arch{margin-top:24px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:26px 24px;
+  box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.archcdn{max-width:360px;margin:0 auto;text-align:center;border:1px dashed var(--line2);border-radius:12px;
+  padding:11px 14px;font-size:13px;color:var(--ink2);background:#FBF8F2}
+.archcdn b{color:var(--ink)}
+.archpipe{width:1px;height:26px;background:var(--line2);margin:0 auto;position:relative}
+.archpipe::after{content:"▼";position:absolute;left:-6px;bottom:-4px;color:#CDB892;font-size:11px}
+.archfile{border:1.5px solid var(--gold);border-radius:14px;padding:8px 8px 14px;background:#FFFDF8;max-width:560px;margin:0 auto;position:relative}
+.archfile .ft{display:inline-block;font-size:12px;font-weight:720;color:var(--gold);background:#FFFDF8;
+  padding:0 10px;position:relative;top:-18px;left:8px;letter-spacing:.3px}
+.archrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:-6px;padding:0 8px}
+.archbox{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.archbox .bk{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.archbox h4{margin:5px 0 4px;font-size:14px;font-weight:720} .archbox p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.archnote{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.anote{font-size:12.5px;color:var(--jade);background:#E3EFE9;border:1px solid #CDE5DB;border-radius:20px;padding:4px 13px;font-weight:600}
+@media(max-width:720px){.archrow{grid-template-columns:1fr}}
+
+/* feature cards */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px 22px 20px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
+.card h3{margin:0 0 8px;font-size:16.5px;font-weight:730;letter-spacing:-.2px}
+.card p{margin:0;color:var(--ink2);font-size:14px}
+@media(max-width:720px){.cards{grid-template-columns:1fr}}
+
+/* two panels */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px;align-items:start}
+.panel{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.panel .pk{font-size:11.5px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase}
+.panel.ok .pk{color:var(--jade)} .panel.no .pk{color:var(--terra)}
+.panel h3{margin:6px 0 0;font-size:16px;font-weight:730}
+.panel ul{margin:12px 0 0;padding-left:18px;color:var(--ink2);font-size:14px} .panel li{margin:6px 0}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
+
+/* quick start */
+.steps{counter-reset:s;margin-top:24px;display:grid;gap:12px}
+.step{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;background:var(--surf);
+  border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.step::before{counter-increment:s;content:counter(s);width:28px;height:28px;border-radius:50%;
+  background:#FAF1DF;border:1px solid #EBD9B6;color:var(--gold);font-weight:760;font-size:14px;
+  display:flex;align-items:center;justify-content:center}
+.step>div{min-width:0} .step h4{margin:2px 0 4px;font-size:15px;font-weight:720} .step p{margin:0;font-size:13.5px;color:var(--ink2)}
+pre{background:#2A2722;color:#F3EEE5;border-radius:10px;padding:13px 15px;overflow-x:auto;font-size:12.5px;
+  font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;line-height:1.6;margin:8px 0 0}
+
+/* disclaimer banner */
+.disc{margin-top:24px;background:#FCF3E8;border:1px solid #EAD2A8;border-left:4px solid var(--gold);
+  border-radius:var(--r);padding:20px 22px}
+.disc .dk{font-size:11.5px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase;color:var(--terra)}
+.disc h3{margin:6px 0 8px;font-size:16px;font-weight:730}
+.disc p{margin:0;color:var(--ink2);font-size:14px;line-height:1.65}
+
+footer{margin-top:74px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:22px;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--ink2)}
+</style></head><body><div class="wrap">
+
+<div class="topbar">
+  <div class="brand">GengScan <span class="tag">Claude Code 技能</span></div>
+  <div class="nav">
+    <span class="lang"><b>中文</b> · <a href="./index.html">English</a></span>
+    <a href="https://github.com/xntj-ai/gengscan">GitHub ↗</a>
+  </div>
+</div>
+
+<div class="kicker">学术诚信筛查 · 机器摆出来,人来定性</div>
+<h1>对论文 Source Data,<br>跑数值造假指纹</h1>
+<p class="lead">GengScan 是一个 Claude Code / Agent 技能。它把一条一线观察到的朴素经验 —— <b>数值造假往往会在数据里留下指纹</b> —— 工程化成可复用流水线:从学者,到论文,到 Source Data,再到数据表里的算术指纹。</p>
+<p class="intro">学术打假志愿者反复撞上同一堵墙:造假能查,但论文太多、人根本看不过来。GengScan 把上千篇论文压成几十个候选,让人把稀缺的判断力只花在数据本身已经显得反常的地方。机器从不宣布造假 —— 每一次命中都是待人核实的线索。</p>
+
+<h2><span class="dot"></span>工作流程</h2>
+<p class="sub">从一份语料到一份分级候选清单:机器做分诊,人下判决。</p>
+<div class="flow">
+  <div class="fstep"><div class="fk">语料</div><h4>学者 → 论文 → 数据</h4><p>把学者名单匹配到论文(OpenAlex 三重锚定),抓取它们的 Source Data 数据表。</p></div>
+  <div class="farr">→</div>
+  <div class="fstep"><div class="fk">检测</div><h4>四类硬指纹</h4><p>对每张表跑 A / G / F / H 检测器,每一类都对良性同形设了闸。</p></div>
+  <div class="farr">→</div>
+  <div class="fstep"><div class="fk">标记</div><h4>异常与存疑</h4><p>输出一份短候选清单 —— 确认的客观异常 / 存疑 / 良性,绝不是指控。</p></div>
+  <div class="farr">→</div>
+  <div class="fstep fin"><div class="fk">人工</div><h4>人工复核</h4><p>人开标记列、结合实验语境读,逐个给候选定性。</p></div>
+</div>
+<p class="note">定性永远不是机器的活 —— 流水线只负责把可疑处规模化地摆到人面前。</p>
+
+<h2><span class="dot"></span>四类硬指纹</h2>
+<p class="sub">每个检测器盯住一种造假的算术痕迹,并自带一个针对其合法「同形」的闸门。</p>
+<div class="shapes">
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><rect x="20" y="12" width="40" height="40" rx="6" fill="#fff" stroke="#C8922E" stroke-width="1.6"/><rect x="90" y="12" width="40" height="40" rx="6" fill="#FBF4E6" stroke="#C8922E" stroke-width="1.6"/><line x1="60" y1="32" x2="90" y2="32" stroke="#C8922E" stroke-width="1.4" stroke-dasharray="3 3"/><text x="75" y="28" font-size="11" fill="#B4502E" text-anchor="middle" font-family="monospace">+c</text></svg>
+    <div class="sn">A · 两列恒差 <span class="se">constant diff</span></div>
+    <p>两列之差恒为非零常数 —— 伪造时给一列统一加了偏移。</p>
+    <span class="gate">闸:排除绝对/相对派生值、坐标、堆叠绘图偏移 —— 看列头语义。</span>
+  </div>
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><text x="40" y="30" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">12<tspan fill="#C8922E">.47</tspan></text><text x="40" y="50" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">38<tspan fill="#C8922E">.47</tspan></text><text x="110" y="30" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">5<tspan fill="#C8922E">.09</tspan></text><text x="110" y="50" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">71<tspan fill="#C8922E">.09</tspan></text></svg>
+    <div class="sn">G · 块级小数锁定 <span class="se">decimal lock</span></div>
+    <p>一块区域小数位完全相同、整数不同 ——「保留小数、改整数」型伪造。</p>
+    <span class="gate">闸:粗网格数据天然重合;要求匹配小数 ≥6 种、主导占比 &lt;60%。</span>
+  </div>
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><rect x="18" y="10" width="30" height="44" rx="5" fill="#fff" stroke="#C8922E" stroke-width="1.6"/><rect x="58" y="10" width="30" height="44" rx="5" fill="#FBF4E6" stroke="#C8922E" stroke-width="1.6"/><path d="M48 18 L58 18 M48 27 L58 27 M48 36 L58 36 M48 45 L58 45" stroke="#1f6f5c" stroke-width="1.4"/><text x="118" y="36" font-size="11" fill="#1f6f5c" text-anchor="middle" font-family="monospace">A=B</text></svg>
+    <div class="sn">F · 同图重复块 <span class="se">duplicate blocks</span></div>
+    <p>同一数值序列跨两列精确相同 —— panel 复制 / copy-paste 指纹。</p>
+    <span class="gate">闸:排除共享单调坐标轴与基线零列(≥40% 为 0)—— 它们是合法复用。</span>
+  </div>
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><rect x="14" y="16" width="122" height="13" rx="3" fill="#fff" stroke="#C8922E" stroke-width="1.5"/><rect x="14" y="35" width="122" height="13" rx="3" fill="#FBF4E6" stroke="#C8922E" stroke-width="1.5"/><text x="9" y="26" font-size="10" fill="#9A9082" text-anchor="end" font-family="monospace">s₁</text><text x="9" y="45" font-size="10" fill="#9A9082" text-anchor="end" font-family="monospace">s₂</text></svg>
+    <div class="sn">H · 行级重复 <span class="se">row duplicate</span></div>
+    <p>整行测量被复制到另一个样本/物种行 —— 跨样本 copy-paste。</p>
+    <span class="gate">闸:组学表行雷同是本质 —— 抑制批量重复,要求复制跨 ≥2 个不同样本标签。</span>
+  </div>
+</div>
+<p class="note">扫描器还会计算更弱的信号(末位锁定、小数末位雷同、列内等差、单值碾压)。它们与良性机制重叠,因此只作保守线索,不进自动榜定论。</p>
+
+<h2><span class="dot"></span>信号可靠性分层 — 诚实地读一次命中</h2>
+<p class="sub">每份报告都区分:哪些是事实、哪些悬而未决、哪些已核为干净。</p>
+<div class="variants">
+  <span class="vchip"><span class="vdot" style="background:#B4502E"></span>确认的客观异常 · 可复现事实,性质仍待定</span>
+  <span class="vchip"><span class="vdot" style="background:#C8922E"></span>存疑 · 机器与人暂时都无法定性</span>
+  <span class="vchip"><span class="vdot" style="background:#1f6f5c"></span>良性 · 已开数据核实为派生 / 组学 / 噪声</span>
+</div>
+
+<h2><span class="dot"></span>跑些什么</h2>
+<p class="sub">四段可独立运行的环节 —— Python 脚本,可单独跑,也可交给 Claude 编排。</p>
+<div class="arch">
+  <div class="archcdn"><b>输入</b><br>一份学者名单(姓名、单位)或一组论文 DOI</div>
+  <div class="archpipe"></div>
+  <div class="archfile">
+    <span class="ft">GengScan 流水线</span>
+    <div class="archrow">
+      <div class="archbox"><div class="bk">匹配与抓取</div><h4>match_scholars · fetch_sources</h4><p>OpenAlex 三重锚定 + ORCID + 机构门;代理优先抓取、解压、记录外链。</p></div>
+      <div class="archbox"><div class="bk">检测</div><h4>forensic · image_forensic</h4><p>A/G/F/H 数值指纹 + 良性闸;可选 ORB + RANSAC 图像取证。</p></div>
+    </div>
+  </div>
+  <div class="archnote">
+    <span class="anote">机器分诊</span>
+    <span class="anote">人来定性</span>
+    <span class="anote">命中 ≠ 判决</span>
+  </div>
+</div>
+<p class="note">内置一个合成阳性对照(植入 A/G/F/H 信号 + 一张干净负对照表),任何阈值改动后都能验证检测器既抓得到、又不误报。</p>
+
+<h2><span class="dot"></span>核心特性</h2>
+<div class="cards">
+  <div class="card"><h3>学者 → 论文匹配</h3><p>三重锚定(姓名拼音 + 依托机构 + 研究领域)对接 OpenAlex,再做 ORCID 核身与逐篇机构门,对抗重名爆炸。</p></div>
+  <div class="card"><h3>稳健的 Source Data 抓取</h3><p>代理优先穿过反爬墙、解压 zip、记录 figshare/Zenodo/Dryad 外链 —— 并带一个 Dryad 工作量证明求解器。</p></div>
+  <div class="card"><h3>四类带闸指纹</h3><p>A 两列恒差、G 块级小数锁定、F 同图重复块、H 行级重复 —— 每类都对其合法同形设了闸。</p></div>
+  <div class="card"><h3>组学假阳闸</h3><p>自动识别并抑制组学/生信表里本质性的批量行重复,避免真正的几处 copy-paste 被淹没。</p></div>
+</div>
+
+<h2><span class="dot"></span>适用场景</h2>
+<div class="two">
+  <div class="panel ok"><div class="pk">适合</div><h3>可规模化的第一遍分诊</h3>
+    <ul><li>对一批论文(学者名单或 DOI)做第一遍筛查,把候选异常摆出来</li><li>已有 Excel Source Data,想跑数值指纹</li><li>复现或改造一套学术诚信筛查工具链</li></ul></div>
+  <div class="panel no"><div class="pk">不适合</div><h3>定性判决或文献检索</h3>
+    <ul><li>给已确认的不端做法律定性</li><li>据机器命中给实名学者扣造假帽</li><li>文献检索,或没有可下载数据表的论文</li></ul></div>
+</div>
+
+<h2><span class="dot"></span>快速开始</h2>
+<div class="steps">
+  <div class="step"><div><h4>装进你的 Claude Code 技能目录</h4><pre>git clone https://github.com/xntj-ai/gengscan.git ~/.claude/skills/gengscan
+cd ~/.claude/skills/gengscan && pip install -r requirements.txt</pre></div></div>
+  <div class="step"><div><h4>用合成阳性对照验证检测器</h4><pre>python scripts/make_synthetic.py
+python scripts/forensic.py synthetic_positive.xlsx --out demo_report.txt</pre></div></div>
+  <div class="step"><div><h4>筛查一批 Source Data,再读候选</h4><p>跑 <code>python scripts/forensic.py --indir ./papers --out forensic_report.txt</code>,或让 Claude 跑流水线并把确认的客观异常 / 存疑 / 良性分开报 —— 绝不是指控。</p></div></div>
+</div>
+
+<div class="disc">
+  <div class="dk">⚠ 免责声明</div>
+  <h3>命中是待人核实的候选 —— 不是造假认定。</h3>
+  <p>指纹命中可能有完全合理的解释(派生列、共享坐标轴、组学批量数据等)。任何指控都必须经过人工核实、作者解释与机构调查。本项目用于学术诚信的<b>防御性</b>研究与方法分享 —— 请负责任地使用,绝不据机器命中给实名学者扣造假帽。</p>
+</div>
+
+<footer>
+  <span>GengScan · MIT License · © <a href="https://xntj.tv">张拼拼 · XNTJ</a></span>
+  <span><a href="https://github.com/xntj-ai/gengscan">GitHub</a> · <a href="https://github.com/xntj-ai/cross-review">cross-review</a> · <a href="https://github.com/xntj-ai/ppvi">ppvi 设计体系</a> · <a href="./index.html">English</a></span>
+</footer>
+
+</div></body></html>

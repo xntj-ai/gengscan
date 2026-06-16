@@ -1,0 +1,256 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GengScan · Data-integrity fingerprint screening for scientific papers</title>
+<meta name="description" content="GengScan is a Claude Code / Agent skill: a reusable pipeline that screens scientific-paper Source Data for numeric fabrication fingerprints — scholars to papers to data to A/G/F/H hard fingerprints, plus optional ORB image forensics. The machine surfaces candidates; a human characterizes them. A hit is not a verdict.">
+<link rel="canonical" href="https://xntj-ai.github.io/gengscan/">
+<link rel="alternate" hreflang="en" href="https://xntj-ai.github.io/gengscan/">
+<link rel="alternate" hreflang="zh-Hans" href="https://xntj-ai.github.io/gengscan/index.zh.html">
+<link rel="alternate" hreflang="x-default" href="https://xntj-ai.github.io/gengscan/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GengScan · Data-integrity fingerprint screening for scientific papers">
+<meta property="og:description" content="A Claude Code / Agent skill that screens paper Source Data for numeric fabrication fingerprints. The machine surfaces candidates; a human characterizes them. A hit is a lead, not a verdict.">
+<meta property="og:locale" content="en_US">
+<style>
+:root{
+  --bg:#FAF8F4; --surf:#FFFFFF; --line:#ECE6DC; --line2:#E2DACB;
+  --ink:#2A2722; --ink2:#6B6356; --mut:#9A9082;
+  --gold:#C8922E; --gold2:#F0B24A; --jade:#1f6f5c; --terra:#B4502E; --blue:#3E6B8C;
+  --r:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,system-ui,sans-serif;
+  font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:.1px}
+a{color:var(--gold);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:30px 28px 90px}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:8px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px;font-weight:740;font-size:16px;letter-spacing:-.2px}
+.brand .tag{font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--gold);
+  background:#FAF1DF;border:1px solid #EBD9B6;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:16px;font-size:13.5px;color:var(--ink2)}
+.nav .lang{color:var(--mut)} .nav .lang b{color:var(--ink)}
+
+/* hero */
+.kicker{font-size:12.5px;letter-spacing:2.5px;color:var(--gold);font-weight:700;text-transform:uppercase}
+h1{font-size:38px;line-height:1.18;letter-spacing:-.6px;margin:14px 0 12px;font-weight:790}
+.lead{color:var(--ink2);font-size:17px;max-width:760px;margin:0}
+.intro{color:var(--ink2);font-size:15.5px;max-width:800px;margin:18px 0 0}
+
+h2{font-size:23px;letter-spacing:-.3px;margin:62px 0 6px;font-weight:730;display:flex;align-items:center;gap:11px}
+h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none}
+.sub{color:var(--ink2);font-size:14.5px;margin:0 0 4px}
+.note{color:var(--mut);font-size:13px;margin-top:12px;line-height:1.6}
+b{font-weight:680}
+code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;
+  background:#F3EEE5;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--terra)}
+
+/* pipeline flow */
+.flow{display:flex;align-items:stretch;gap:10px;margin-top:26px;flex-wrap:wrap}
+.fstep{flex:1;min-width:158px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 17px;position:relative;box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.fstep .fk{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.fstep h4{margin:8px 0 6px;font-size:15.5px;font-weight:730;letter-spacing:-.2px}
+.fstep p{margin:0;font-size:13px;color:var(--ink2);line-height:1.55}
+.fstep.fin{border-color:#E6C98A;background:linear-gradient(180deg,#FFFDF8,#FFF)}
+.fstep.fin .fk{color:var(--gold)}
+.farr{display:flex;align-items:center;color:#CDB892;font-size:22px;font-weight:400;flex:none;padding:0 2px}
+@media(max-width:720px){.farr{transform:rotate(90deg);align-self:center;padding:3px 0}.fstep{min-width:100%}.flow{flex-direction:column}}
+
+/* shapes */
+.shapes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
+.shape{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px 18px;text-align:center;
+  box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.shape svg{display:block;margin:0 auto 14px}
+.shape .sn{font-size:15px;font-weight:730} .shape .se{font-size:12.5px;color:var(--mut);letter-spacing:.5px}
+.shape p{margin:8px 0 0;font-size:13px;color:var(--ink2);line-height:1.55}
+.shape .gate{display:block;margin-top:9px;font-size:11.5px;color:var(--jade);background:#E3EFE9;
+  border:1px solid #CDE5DB;border-radius:8px;padding:6px 9px;line-height:1.5;text-align:left}
+.variants{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.vchip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2);
+  background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+.vdot{width:10px;height:10px;border-radius:50%;flex:none}
+@media(max-width:720px){.shapes{grid-template-columns:1fr}}
+
+/* architecture */
+.arch{margin-top:24px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:26px 24px;
+  box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.archcdn{max-width:360px;margin:0 auto;text-align:center;border:1px dashed var(--line2);border-radius:12px;
+  padding:11px 14px;font-size:13px;color:var(--ink2);background:#FBF8F2}
+.archcdn b{color:var(--ink)}
+.archpipe{width:1px;height:26px;background:var(--line2);margin:0 auto;position:relative}
+.archpipe::after{content:"▼";position:absolute;left:-6px;bottom:-4px;color:#CDB892;font-size:11px}
+.archfile{border:1.5px solid var(--gold);border-radius:14px;padding:8px 8px 14px;background:#FFFDF8;max-width:560px;margin:0 auto;position:relative}
+.archfile .ft{display:inline-block;font-size:12px;font-weight:720;color:var(--gold);background:#FFFDF8;
+  padding:0 10px;position:relative;top:-18px;left:8px;letter-spacing:.3px}
+.archrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:-6px;padding:0 8px}
+.archbox{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.archbox .bk{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.archbox h4{margin:5px 0 4px;font-size:14px;font-weight:720} .archbox p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.archnote{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.anote{font-size:12.5px;color:var(--jade);background:#E3EFE9;border:1px solid #CDE5DB;border-radius:20px;padding:4px 13px;font-weight:600}
+@media(max-width:720px){.archrow{grid-template-columns:1fr}}
+
+/* feature cards */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px 22px 20px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
+.card h3{margin:0 0 8px;font-size:16.5px;font-weight:730;letter-spacing:-.2px}
+.card p{margin:0;color:var(--ink2);font-size:14px}
+@media(max-width:720px){.cards{grid-template-columns:1fr}}
+
+/* two panels */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px;align-items:start}
+.panel{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:0 1px 2px rgba(42,39,34,.03)}
+.panel .pk{font-size:11.5px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase}
+.panel.ok .pk{color:var(--jade)} .panel.no .pk{color:var(--terra)}
+.panel h3{margin:6px 0 0;font-size:16px;font-weight:730}
+.panel ul{margin:12px 0 0;padding-left:18px;color:var(--ink2);font-size:14px} .panel li{margin:6px 0}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
+
+/* quick start */
+.steps{counter-reset:s;margin-top:24px;display:grid;gap:12px}
+.step{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;background:var(--surf);
+  border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.step::before{counter-increment:s;content:counter(s);width:28px;height:28px;border-radius:50%;
+  background:#FAF1DF;border:1px solid #EBD9B6;color:var(--gold);font-weight:760;font-size:14px;
+  display:flex;align-items:center;justify-content:center}
+.step>div{min-width:0} .step h4{margin:2px 0 4px;font-size:15px;font-weight:720} .step p{margin:0;font-size:13.5px;color:var(--ink2)}
+pre{background:#2A2722;color:#F3EEE5;border-radius:10px;padding:13px 15px;overflow-x:auto;font-size:12.5px;
+  font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;line-height:1.6;margin:8px 0 0}
+
+/* disclaimer banner */
+.disc{margin-top:24px;background:#FCF3E8;border:1px solid #EAD2A8;border-left:4px solid var(--gold);
+  border-radius:var(--r);padding:20px 22px}
+.disc .dk{font-size:11.5px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase;color:var(--terra)}
+.disc h3{margin:6px 0 8px;font-size:16px;font-weight:730}
+.disc p{margin:0;color:var(--ink2);font-size:14px;line-height:1.65}
+
+footer{margin-top:74px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:22px;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--ink2)}
+</style></head><body><div class="wrap">
+
+<div class="topbar">
+  <div class="brand">GengScan <span class="tag">Claude Code Skill</span></div>
+  <div class="nav">
+    <span class="lang"><b>English</b> · <a href="./index.zh.html">中文</a></span>
+    <a href="https://github.com/xntj-ai/gengscan">GitHub ↗</a>
+  </div>
+</div>
+
+<div class="kicker">Research-integrity screening · The machine surfaces, a human decides</div>
+<h1>Screen scientific Source Data<br>for fabrication fingerprints</h1>
+<p class="lead">GengScan is a Claude Code / Agent skill. It turns one field-observed idea — <b>numeric fabrication tends to leave fingerprints in the data</b> — into a reusable pipeline: from scholars, to papers, to Source Data, to the arithmetic fingerprints inside the spreadsheets.</p>
+<p class="intro">Integrity volunteers keep hitting the same wall: fabrication is detectable, but there are too many papers and too few eyes. GengScan compresses thousands of papers into a handful of candidates so a person spends their scarce judgment only where the data already looks odd. The machine never declares fabrication — every hit is a lead awaiting human verification.</p>
+
+<h2><span class="dot"></span>How it works</h2>
+<p class="sub">From a corpus to a graded candidate list, the machine does triage and the human does the verdict.</p>
+<div class="flow">
+  <div class="fstep"><div class="fk">Corpus</div><h4>Scholars → papers → data</h4><p>Resolve a scholar list to papers (OpenAlex triple anchoring) and fetch their Source Data spreadsheets.</p></div>
+  <div class="farr">→</div>
+  <div class="fstep"><div class="fk">Detect</div><h4>Four hard fingerprints</h4><p>Run the A / G / F / H detectors over every sheet, each gated against its benign look-alikes.</p></div>
+  <div class="farr">→</div>
+  <div class="fstep"><div class="fk">Flag</div><h4>Anomaly &amp; suspected</h4><p>Output a short candidate list — confirmed objective anomaly vs. suspected vs. benign, never an accusation.</p></div>
+  <div class="farr">→</div>
+  <div class="fstep fin"><div class="fk">Human</div><h4>Manual review</h4><p>A person opens the flagged columns, reads them in experimental context, and characterizes each candidate.</p></div>
+</div>
+<p class="note">Characterization is never the machine's job — the pipeline only puts the suspicious in front of a person, at scale.</p>
+
+<h2><span class="dot"></span>The four hard fingerprints</h2>
+<p class="sub">Each detector targets one arithmetic trace of fabrication — and ships with a gate for its legitimate same-shape explanation.</p>
+<div class="shapes">
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><rect x="20" y="12" width="40" height="40" rx="6" fill="#fff" stroke="#C8922E" stroke-width="1.6"/><rect x="90" y="12" width="40" height="40" rx="6" fill="#FBF4E6" stroke="#C8922E" stroke-width="1.6"/><line x1="60" y1="32" x2="90" y2="32" stroke="#C8922E" stroke-width="1.4" stroke-dasharray="3 3"/><text x="75" y="28" font-size="11" fill="#B4502E" text-anchor="middle" font-family="monospace">+c</text></svg>
+    <div class="sn">A · Constant difference <span class="se">两列恒差</span></div>
+    <p>Two columns differ by a fixed non-zero constant — a uniform offset added during fabrication.</p>
+    <span class="gate">Gate: exclude absolute-vs-relative derived values, coordinates, stacked-plot offsets — read the column header.</span>
+  </div>
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><text x="40" y="30" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">12<tspan fill="#C8922E">.47</tspan></text><text x="40" y="50" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">38<tspan fill="#C8922E">.47</tspan></text><text x="110" y="30" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">5<tspan fill="#C8922E">.09</tspan></text><text x="110" y="50" font-size="15" fill="#2A2722" text-anchor="middle" font-family="monospace">71<tspan fill="#C8922E">.09</tspan></text></svg>
+    <div class="sn">G · Decimal lock <span class="se">块级小数锁定</span></div>
+    <p>A block keeps identical decimal parts while integer parts differ — "kept decimals, changed integers".</p>
+    <span class="gate">Gate: coarse-grid data coincides by nature; require ≥6 distinct decimals and dominant share &lt;60%.</span>
+  </div>
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><rect x="18" y="10" width="30" height="44" rx="5" fill="#fff" stroke="#C8922E" stroke-width="1.6"/><rect x="58" y="10" width="30" height="44" rx="5" fill="#FBF4E6" stroke="#C8922E" stroke-width="1.6"/><path d="M48 18 L58 18 M48 27 L58 27 M48 36 L58 36 M48 45 L58 45" stroke="#1f6f5c" stroke-width="1.4"/><text x="118" y="36" font-size="11" fill="#1f6f5c" text-anchor="middle" font-family="monospace">A=B</text></svg>
+    <div class="sn">F · Duplicate blocks <span class="se">同图重复块</span></div>
+    <p>An identical numeric sequence appears across two columns — a panel-copy / copy-paste fingerprint.</p>
+    <span class="gate">Gate: exclude shared monotonic axes and baseline-zero (≥40% zero) columns — they reuse legitimately.</span>
+  </div>
+  <div class="shape">
+    <svg width="150" height="64" viewBox="0 0 150 64"><rect x="14" y="16" width="122" height="13" rx="3" fill="#fff" stroke="#C8922E" stroke-width="1.5"/><rect x="14" y="35" width="122" height="13" rx="3" fill="#FBF4E6" stroke="#C8922E" stroke-width="1.5"/><text x="9" y="26" font-size="10" fill="#9A9082" text-anchor="end" font-family="monospace">s₁</text><text x="9" y="45" font-size="10" fill="#9A9082" text-anchor="end" font-family="monospace">s₂</text></svg>
+    <div class="sn">H · Row-level duplicate <span class="se">行级重复</span></div>
+    <p>A whole measurement row is copied to another sample / species row — cross-sample copy-paste.</p>
+    <span class="gate">Gate: omics tables repeat by nature — suppress bulk repeats, require the copy to span ≥2 distinct sample labels.</span>
+  </div>
+</div>
+<p class="note">The scanner also computes softer signals (terminal-digit lock, decimal-tail repetition, in-column arithmetic, value domination). They overlap with benign mechanisms, so they stay conservative leads — not auto-list verdicts.</p>
+
+<h2><span class="dot"></span>Reliability tiers — read a hit honestly</h2>
+<p class="sub">Every report separates what is fact, what is unresolved, and what was checked clean.</p>
+<div class="variants">
+  <span class="vchip"><span class="vdot" style="background:#B4502E"></span>Confirmed objective anomaly · reproducible fact, intent still unsettled</span>
+  <span class="vchip"><span class="vdot" style="background:#C8922E"></span>Suspected · neither machine nor human can characterize yet</span>
+  <span class="vchip"><span class="vdot" style="background:#1f6f5c"></span>Benign · opened &amp; verified as derived / omics / noise</span>
+</div>
+
+<h2><span class="dot"></span>What runs</h2>
+<p class="sub">Four standalone stages — Python scripts you can run on their own or let Claude orchestrate.</p>
+<div class="arch">
+  <div class="archcdn"><b>Inputs</b><br>A scholar list (name, org) or a set of paper DOIs</div>
+  <div class="archpipe"></div>
+  <div class="archfile">
+    <span class="ft">The GengScan pipeline</span>
+    <div class="archrow">
+      <div class="archbox"><div class="bk">Resolve &amp; fetch</div><h4>match_scholars · fetch_sources</h4><p>OpenAlex triple anchoring + ORCID + institution gate; proxy-first fetch, zip, external links.</p></div>
+      <div class="archbox"><div class="bk">Detect</div><h4>forensic · image_forensic</h4><p>A/G/F/H numeric fingerprints with benign gates; optional ORB + RANSAC image forensics.</p></div>
+    </div>
+  </div>
+  <div class="archnote">
+    <span class="anote">Machine triages</span>
+    <span class="anote">Human characterizes</span>
+    <span class="anote">A hit ≠ a verdict</span>
+  </div>
+</div>
+<p class="note">A built-in synthetic positive control (planted A/G/F/H signals + one clean negative-control sheet) lets you verify the detectors fire — and don't false-trigger — after any threshold change.</p>
+
+<h2><span class="dot"></span>Core features</h2>
+<div class="cards">
+  <div class="card"><h3>Scholar → paper resolution</h3><p>Triple anchoring (pinyin name + institution + field) against OpenAlex, then ORCID identity check and a per-paper institution gate to fight name collisions.</p></div>
+  <div class="card"><h3>Robust Source Data fetching</h3><p>Proxy-first through anti-scraping walls, zip extraction, and recorded figshare / Zenodo / Dryad links — with a Dryad proof-of-work solver.</p></div>
+  <div class="card"><h3>Four gated fingerprints</h3><p>A constant difference, G decimal lock, F duplicate blocks, H row duplicates — each gated against its legitimate same-shape explanation.</p></div>
+  <div class="card"><h3>Omics false-positive gate</h3><p>Bulk row duplication typical of omics / bioinformatics tables is identified and suppressed, so a few real copy-pastes are not buried.</p></div>
+</div>
+
+<h2><span class="dot"></span>When to use</h2>
+<div class="two">
+  <div class="panel ok"><div class="pk">Good fit</div><h3>Scalable first-pass triage</h3>
+    <ul><li>A first pass over many papers (scholar list or DOIs) to surface candidate anomalies</li><li>You already have Excel Source Data and want to run the numeric fingerprints</li><li>Reproducing or adapting an integrity-screening toolchain</li></ul></div>
+  <div class="panel no"><div class="pk">Not for</div><h3>Verdicts or search</h3>
+    <ul><li>Legally characterizing already-confirmed misconduct</li><li>Pinning a fabrication label on a named scholar from a machine hit</li><li>Literature search, or papers with no downloadable data tables</li></ul></div>
+</div>
+
+<h2><span class="dot"></span>Quick start</h2>
+<div class="steps">
+  <div class="step"><div><h4>Install into your Claude Code skills directory</h4><pre>git clone https://github.com/xntj-ai/gengscan.git ~/.claude/skills/gengscan
+cd ~/.claude/skills/gengscan && pip install -r requirements.txt</pre></div></div>
+  <div class="step"><div><h4>Verify the detectors with a synthetic positive control</h4><pre>python scripts/make_synthetic.py
+python scripts/forensic.py synthetic_positive.xlsx --out demo_report.txt</pre></div></div>
+  <div class="step"><div><h4>Screen a directory of Source Data, then read the candidates</h4><p>Run <code>python scripts/forensic.py --indir ./papers --out forensic_report.txt</code>, or ask Claude to run the pipeline and report confirmed anomaly vs. suspected vs. benign — separately, never as an accusation.</p></div></div>
+</div>
+
+<div class="disc">
+  <div class="dk">⚠ Disclaimer</div>
+  <h3>A hit is a candidate awaiting human verification — not a finding of fabrication.</h3>
+  <p>A fingerprint match can have a perfectly legitimate explanation (derived columns, shared axes, bulk omics data, and more). Any allegation must go through human verification, the authors' explanation, and an institutional investigation. This project is for <b>defensive</b> research-integrity work and method sharing — use it responsibly, and never use a machine hit to pin a fabrication label on a named scholar.</p>
+</div>
+
+<footer>
+  <span>GengScan · MIT License · © <a href="https://xntj.tv">张拼拼 · XNTJ</a></span>
+  <span><a href="https://github.com/xntj-ai/gengscan">GitHub</a> · <a href="https://github.com/xntj-ai/cross-review">cross-review</a> · <a href="https://github.com/xntj-ai/ppvi">ppvi design system</a> · <a href="./index.zh.html">中文</a></span>
+</footer>
+
+</div></body></html>
